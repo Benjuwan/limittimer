@@ -1,28 +1,35 @@
 document.addEventListener('DOMContentLoaded', ()=>{
 	
-	// 時間が来れば表示される更新時のアナウンステキスト（example:this is limitTimer sys.<br>you can choose function that <br> addClass specific element or <br> view specific sentence like this.）
+	// アナウンステキスト
 	const nextModifyInfo = 'this is limitTimer sys.<br>you can choose function that <br> addClass specific element or <br> view specific sentence like this.';
+  // 処理させたい内容（関数）
+  function targetFunction_Ver001(){
+    const targetEl = document.body;
+    if(nextModifyInfo === ''){ // アナウンステキストに記入なしの場合
+      targetEl.classList.toggle('NoTxt_toggleClass');
+    } else {
+      targetEl.classList.toggle('NoTxt_toggleClass');
+      targetEl.insertAdjacentHTML('beforeend', `<div class="closed"><p>${nextModifyInfo}</p></div>`);
+    }
+  }
 	
-  /*
-  クラスの引数について：（左から）年,月,日,時,分,アナウンステキスト,付与するclass名,表示対象要素を指定
-    |-アナウンステキストとclass付与はどちらか一方のみ適用という使い分けも可能
-    |-classはtoggleClassなので、前もって所定のhtml要素にclassを付与しておくことで設定時間に合わせてremoveClassすることも可能
-  */
-  new kirishimaClass_PresentCloseSys(2022, 8, 26, 10, 30, nextModifyInfo, 'NoTxt_toggleClass', 'body');
+  // （左から）年,月,日,時,分,アナウンステキスト,関数を指定
+  new kirishimaClass_PresentCloseSys(2022, 11, 25, 10, 00, targetFunction_Ver001);
+  
 });
 
-// 以下はclass（具体的な機能指示）の指定
+
+
+/* ---------------------- 以下はclass（具体的な機能指示）の指定 ---------------------- */
 
 class kirishimaClass_PresentCloseSys {
-  constructor(targetYear, targetMonth, targetDate, targetHours, targetMinutes, targetTxt, NoTxt_toggleClass, targetEl){
+  constructor(targetYear, targetMonth, targetDate, targetHours, targetMinutes, targetFunction){
 		this.targetYear = targetYear;
 		this.targetMonth = targetMonth;
     this.targetDate = targetDate;
     this.targetHours = targetHours;
     this.targetMinutes = targetMinutes;
-		this.targetTxt = targetTxt;
-    this.NoTxt_toggleClass = NoTxt_toggleClass;
-    this.targetEl = targetEl;
+    this.targetFunction = targetFunction;
 
     const timer = setInterval(()=>{
       let now = new Date();
@@ -43,17 +50,10 @@ class kirishimaClass_PresentCloseSys {
         let NowDate = Number(NowDateStr);
         this.targetTime = Number(targetTimeStr);
 			
-        if(NowDate >= this.targetTime){ 
-            clearInterval(timer);
-          
-          if(this.targetTxt === ''){ // アナウンステキストに記入なしの場合
-            document.querySelector(this.targetEl).classList.toggle(this.NoTxt_toggleClass);
-          } else if(this.NoTxt_toggleClass === ''){  // 付与したいclassがなしの場合
-            document.querySelector(this.targetEl).insertAdjacentHTML('beforeend', `<div class="closed"><p>${this.targetTxt}</p></div>`);
-          } else if((this.targetTxt && this.NoTxt_toggleClass) !== null) { // 両方nullじゃない（両方記入している）場合
-            document.querySelector(this.targetEl).classList.toggle(this.NoTxt_toggleClass);
-            document.querySelector(this.targetEl).insertAdjacentHTML('beforeend', `<div class="closed"><p>${this.targetTxt}</p></div>`);
-          }
+        if(NowDate >= this.targetTime){
+          clearInterval(timer);
+          // 指定時間の到達後に処理させたい内容（関数）の指定
+          this.targetFunction();
         }
       
         console.log(this.targetTime);
